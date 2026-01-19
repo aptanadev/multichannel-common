@@ -100,11 +100,11 @@ export class TokenGuard implements Guard {
     let userToken = this._req.query['userToken'];
 
     if (!userKey) {
-      userKey = this._req.body['userKey'];
+      userKey = this._req.body['userKey'] || this._req.body['userkey_'];
     }
 
     if (!userToken) {
-      userToken = this._req.body['userToken'];
+      userToken = this._req.body['userToken'] || this._req.body['usertoken_'];
     }
 
     return { userKey, userToken };
