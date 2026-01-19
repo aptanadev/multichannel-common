@@ -1,5 +1,5 @@
 {
-  "name": "@amirmarmul/waba-common",
+  "name": "@aptana/multichannel-common",
   "version": "2.9.11",
   "license": "MIT",
   "description": "",
@@ -9,7 +9,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/amirmarmul/waba-common.git"
+    "url": "https://github.com/aptana/multichannel-common.git"
   },
   "scripts": {
     "build": "tsc && tsc-alias",
