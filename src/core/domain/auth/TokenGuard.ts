@@ -96,15 +96,15 @@ export class TokenGuard implements Guard {
   }
 
   private getUserKeyTokenFromRequest() {
-    let userKey = this._req.query['userkey'];
-    let userToken = this._req.query['usertoken'];
+    let userKey = this._req.query['userKey'];
+    let userToken = this._req.query['userToken'];
 
     if (!userKey) {
-      userKey = this._req.body['userkey'];
+      userKey = this._req.body['userKey'];
     }
 
     if (!userToken) {
-      userToken = this._req.body['usertoken'];
+      userToken = this._req.body['userToken'];
     }
 
     return { userKey, userToken };
