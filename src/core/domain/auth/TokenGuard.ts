@@ -70,6 +70,7 @@ export class TokenGuard implements Guard {
       user = await this._provider.getByToken(token);
     }
 
+    // 
     return user;
     // return this._user = user!;
   }
