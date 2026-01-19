@@ -64,12 +64,10 @@ export class TokenGuard implements Guard {
     let token = this.getTokenFromRequest();
     let { userKey, userToken } = this.getUserKeyTokenFromRequest()
 
-    if (token) {
-      user = await this._provider.getByToken(token);
-    }
-
     if (userKey && userToken) {
       user = await this._provider.getByUserKeyAndUserToken(userKey, userToken);
+    } else if (token) {
+      user = await this._provider.getByToken(token);
     }
 
     return user;
