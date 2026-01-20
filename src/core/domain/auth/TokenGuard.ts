@@ -20,11 +20,17 @@ export class TokenGuard implements Guard {
   private _user: Authenticable;
 
   /**
+   * Skip userKey & userToken authentication
+   */
+  private _skipUserKeyAuth: boolean;
+
+  /**
    * Create a new authtentication guard.
    */
-  constructor(provider: UserProvider, req: any) {
+  constructor(provider: UserProvider, req: any, options?: { skipUserKeyAuth?: boolean }) {
     this._provider = provider;
     this._req = req;
+    this._skipUserKeyAuth = options?.skipUserKeyAuth ?? false;
   }
 
   /**
@@ -64,7 +70,8 @@ export class TokenGuard implements Guard {
     let token = this.getTokenFromRequest();
     let { userKey, userToken } = this.getUserKeyTokenFromRequest()
 
-    if (userKey && userToken) {
+    // Skip userKey auth if configured
+    if (!this._skipUserKeyAuth && userKey && userToken) {
       user = await this._provider.getByUserKeyAndUserToken(userKey, userToken);
     } else if (token) {
       user = await this._provider.getByToken(token);
