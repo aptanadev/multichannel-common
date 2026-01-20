@@ -37,12 +37,17 @@ export class TokenGuard implements Guard {
    * Determine if the current user is authenticated. If not, throw an error.
    */
   async authenticate() {
-    const user = await this.user();
-    if (user) {
-      return user;
+    try {
+      const user = await this.user();
+      if (user) {
+        return user;
+      }
+    } catch (error: any) {
+      if (error && error.statusCode) {
+        throw error;
+      }
+      throw new WrongCredentialsError();
     }
-
-    throw new WrongCredentialsError();
   }
 
   async check() {
