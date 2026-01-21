@@ -42,10 +42,6 @@ export class TokenGuard implements Guard {
       return user;
     }
 
-    if (this._skipUserKeyAuth) {
-
-    }
-
     throw new WrongCredentialsError();
   }
 
@@ -77,7 +73,7 @@ export class TokenGuard implements Guard {
     // Skip userKey auth if configured
     if (!this._skipUserKeyAuth && userKey && userToken) {
       user = await this._provider.getByUserKeyAndUserToken(userKey, userToken);
-    } else if (token) {
+    } else {
       user = await this._provider.getByToken(token);
     }
 
