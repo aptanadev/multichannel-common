@@ -15,6 +15,9 @@ export * from "@/core/infrastructure/http/App";
 export * from "@/core/infrastructure/events/Event";
 export * from "@/core/infrastructure/events/Listener";
 export * from "@/core/infrastructure/events/Worker";
+export * from "@/core/infrastructure/events/outbox/OutboxModel";
+export * from "@/core/infrastructure/events/outbox/OutboxRepo";
+export * from "@/core/infrastructure/events/outbox/OutboxRelay";
 
 export { Event as EventRpc } from "@/core/infrastructure/events/rpc/Event";
 export { Listener as ListenerRpc } from "@/core/infrastructure/events/rpc/Listener";

@@ -31,6 +31,10 @@ export abstract class Event<T> implements EventContract {
     return this;
   }
 
+  get outboxData(): { exchange: string; topic: string; payload: T } {
+    return { exchange: this.exchange, topic: this.topic, payload: this.payload };
+  }
+
   protected setup(channel: Channel): void {
     channel.assertExchange(this.exchange, "topic", { durable: false });
   }
