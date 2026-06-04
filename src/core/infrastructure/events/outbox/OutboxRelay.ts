@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import logger from '@/core/utils/logger';
 import { Loader } from '@/core/infrastructure/loaders/Loader';
 import { ChannelEvent } from '../ChannelEvent';
@@ -25,15 +26,24 @@ export class OutboxRelay extends Loader {
   }
 
   register(): void {
-    this.startSweeper();
-    if (this.enableSprinter) {
-      this.startSprinter();
+    const startRelay = () => {
+      this.startSweeper();
+      if (this.enableSprinter) {
+        this.startSprinter();
+      }
+      logger.info('OutboxRelay started', {
+        sweepIntervalMs: this.sweepIntervalMs,
+        batchSize: this.batchSize,
+        enableSprinter: this.enableSprinter,
+      });
+    };
+
+    if (mongoose.connection.readyState === 1) {
+      startRelay();
+    } else {
+      mongoose.connection.once('open', startRelay);
+      logger.debug('OutboxRelay waiting for MongoDB connection...');
     }
-    logger.info('OutboxRelay started', {
-      sweepIntervalMs: this.sweepIntervalMs,
-      batchSize: this.batchSize,
-      enableSprinter: this.enableSprinter,
-    });
   }
 
   start(): void {
@@ -50,11 +60,15 @@ export class OutboxRelay extends Loader {
       const stream = OutboxModel.watch([{ $match: { operationType: 'insert' } }]);
 
       stream.on('change', () => {
-        // Trigger an immediate sweep instead of publishing directly
-        // so the sweeper's pessimistic locking handles multi-instance concurrency
-        this.sweep().catch((err) => {
-          logger.error('OutboxRelay sprinter-triggered sweep error', { message: err.message });
-        });
+        // Add random jitter (0-500ms) to spread concurrent sweeps across replicas.
+        // claimBatch's pessimistic locking ensures correctness — jitter only reduces
+        // MongoDB query burst when multiple replicas receive the same change event.
+        const jitter = Math.floor(Math.random() * 500);
+        setTimeout(() => {
+          this.sweep().catch((err) => {
+            logger.error('OutboxRelay sprinter-triggered sweep error', { message: err.message });
+          });
+        }, jitter);
       });
 
       stream.on('error', (err: Error) => {
