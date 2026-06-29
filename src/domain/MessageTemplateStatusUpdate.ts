@@ -4,6 +4,7 @@ export interface MessageTemplateStatusUpdate {
   sourceReason?: string;
   status: string;
   notes?: string;
+  payload?: any;
 }
 
 export default MessageTemplateStatusUpdate;
