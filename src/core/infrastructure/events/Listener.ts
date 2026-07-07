@@ -45,26 +45,15 @@ export abstract class Listener<T> implements ListenerContract {
   }
 
   abstract onMessage(data: T, ack: Function, nack?: Function): any;
-  static onError?: (error: Error, context: { listener: string; exchange: string; topic: string; queue: string; data: any }) => void;
 
   public listen() {
-    return this.channel.consume(this.queue, async (msg) => {
+    return this.channel.consume(this.queue, (msg) => {
       const parsedMessage = this.parseMessage(msg);
       logger.debug('Receive message %s', this.constructor.name, { parsedMessage });
 
       if (!parsedMessage) return;
 
-      try {
-        await this.onMessage(parsedMessage, () => this.channel.ack(msg), () => this.channel.nack(msg));
-      } catch (error: any) {
-        Listener.onError?.(error, {
-          listener: this.constructor.name,
-          exchange: this.exchange,
-          topic: this.topic,
-          queue: this.queue,
-          data: parsedMessage,
-        });
-      }
+      this.onMessage(parsedMessage, () => this.channel.ack(msg), () => this.channel.nack(msg));
     });
   }
 
